@@ -78,4 +78,35 @@ public class PartidasService {
         return Response.status(201).entity(entity).build();
     }
 
+    @GET
+    @ApiOperation(value = "Listado de las partidas de un usuario", notes = "asdasd")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successful", response = Partida.class, responseContainer="List")
+    })
+    @Path("partidasByUser/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPartidasByUser(@PathParam("id") String id) {
+        List<Partida> partidas = this.pm.partidasByUser(id);
+        GenericEntity<List<Partida>> entity = new GenericEntity<List<Partida>>(partidas){};
+        return Response.status(201).entity(entity).build();
+    }
+
+    @PUT
+    @ApiOperation(value = "Subir de nivel", notes = "asdasd")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successful"),
+            @ApiResponse(code = 404, message = "Track not found")
+    })
+    @Path("/subirNivel")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+
+    public Response subirNivel() {
+
+        int num = this.pm.subirNivel("22222", 40, java.time.LocalDateTime.now());
+        return Response.status(201).entity(num).build();
+    }
+
+
 }
+

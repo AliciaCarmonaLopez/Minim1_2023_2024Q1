@@ -9,19 +9,9 @@ public class Juego {
     private String idJuego;
     private String descripcion;
     private int niveles;
-    private List<User> listaJugadores;
 
-    public List<User> getListaJugadores() {
-        return listaJugadores;
-    }
 
-    public void setListaJugadores(List<User> listaJugadores) {
-        this.listaJugadores = listaJugadores;
-    }
 
-    public void addJugador(User u){
-        listaJugadores.add(u);
-    }
     public String getIdJuego() {
         return idJuego;
     }
@@ -46,15 +36,12 @@ public class Juego {
         this.niveles = niveles;
     }
 
-    public Juego() {
-        listaJugadores = new ArrayList<>();
-    }
+    public Juego() {}
 
     public Juego(String idJuego, String descripcion, int niveles) {
         this.idJuego = idJuego;
         this.descripcion = descripcion;
         this.niveles = niveles;
-        this.listaJugadores = new ArrayList<>();
     }
 
 }
