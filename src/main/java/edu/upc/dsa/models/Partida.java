@@ -39,6 +39,7 @@ public class Partida {
         cambiosNivel.put(0,java.time.LocalDateTime.now());
     }
 
+    public Partida(){}
     public void setPuntuacion(int puntuacion) {
         this.puntuacion = puntuacion;
     }
