@@ -39,14 +39,43 @@ public class PartidasService {
     }
 
     @GET
-    @ApiOperation(value = "consultar puntuación actual de un usuario", notes = "asdasd")
+    @ApiOperation(value = "Consultar puntuación actual", notes = "asdasd")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful", response = Integer.class),
+            @ApiResponse(code = 201, message = "Successful", response = String.class),
+            @ApiResponse(code = 404, message = "User not found")
     })
-    @Path("/getPuntuacionActual/{id}")
+    @Path("puntuacionActual/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getProductsByPrice(@PathParam("id") String id) {
-        GenericEntity<Integer> entity = new GenericEntity<Integer>(pm.puntuacionActual(id)) {};
+    public Response getPuntuacionActual(@PathParam("id") String id) {
+        int t = pm.puntuacionActual(id);
+        if (t == -1) return Response.status(404).build();
+        else  return Response.status(201).entity(String.valueOf(t)).build();
+    }
+    @GET
+    @ApiOperation(value = "Consultar nivel actual", notes = "asdasd")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successful", response = String.class),
+            @ApiResponse(code = 404, message = "User not found")
+    })
+    @Path("nivelActual/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getNivelActual(@PathParam("id") String id) {
+        int t = pm.nivelActual(id);
+        if (t == -1) return Response.status(404).build();
+        else  return Response.status(201).entity(String.valueOf(t)).build();
+    }
+
+    @GET
+    @ApiOperation(value = "list the users of a game", notes = "asdasd")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successful", response = User.class, responseContainer="List")
+    })
+    @Path("usersByJuego/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsersByJuego(@PathParam("id") String id) {
+        List<User> users = this.pm.usersByJuego(id);
+        GenericEntity<List<User>> entity = new GenericEntity<List<User>>(users){};
         return Response.status(201).entity(entity).build();
     }
+
 }

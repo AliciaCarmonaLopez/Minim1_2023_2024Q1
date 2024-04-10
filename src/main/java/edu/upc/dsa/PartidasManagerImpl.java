@@ -120,6 +120,7 @@ public class PartidasManagerImpl implements PartidasManager {
 
     @Override
     public List<User> usersByJuego(String idJuego) {
+        logger.info("Usuarios que han jugado a: " + idJuego);
         List<Partida> lp = new ArrayList<>();
         List<User> lu = new ArrayList<>();
         for(String s:listaUsers.keySet())
