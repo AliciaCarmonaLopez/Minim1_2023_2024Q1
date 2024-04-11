@@ -1,4 +1,5 @@
 package edu.upc.dsa.services;
+import edu.upc.dsa.models.Puntuacio;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -15,6 +16,7 @@ import edu.upc.dsa.PartidasManagerImpl;
 import edu.upc.dsa.models.Partida;
 import edu.upc.dsa.models.Juego;
 import edu.upc.dsa.models.User;
+import edu.upc.dsa.models.Mensaje;
 
 @Api(value = "/partidas", description = "Endpoint to Partida Service")
 @Path("/partidas")
@@ -41,7 +43,7 @@ public class PartidasService {
     @GET
     @ApiOperation(value = "Consultar puntuación actual", notes = "asdasd")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Successful", response = String.class),
+            @ApiResponse(code = 201, message = "Successful", response = Puntuacio.class),
             @ApiResponse(code = 404, message = "User not found")
     })
     @Path("puntuacionActual/{id}")
@@ -49,7 +51,8 @@ public class PartidasService {
     public Response getPuntuacionActual(@PathParam("id") String id) {
         int t = pm.puntuacionActual(id);
         if (t == -1) return Response.status(404).build();
-        else  return Response.status(201).entity(String.valueOf(t)).build();
+        //else  return Response.status(201).entity(String.valueOf(t)).build();
+        else return Response.status(201).entity(new Puntuacio(id, t)).build();
     }
     @GET
     @ApiOperation(value = "Consultar nivel actual", notes = "asdasd")
@@ -101,10 +104,26 @@ public class PartidasService {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
 
-    public Response subirNivel() {
+    public Response subirNivel(Puntuacio p) {
+        int num = this.pm.subirNivel(p.getId(), p.getP(), java.time.LocalDateTime.now());
+        Puntuacio punt = new Puntuacio(p.getId(), num);
+        return Response.status(201).entity(punt).build();
+    }
 
-        int num = this.pm.subirNivel("22222", 40, java.time.LocalDateTime.now());
-        return Response.status(201).entity(num).build();
+    @PUT
+    @ApiOperation(value = "Subir de nivel", notes = "asdasd")
+    @ApiResponses(value = {
+            @ApiResponse(code = 201, message = "Successful"),
+            @ApiResponse(code = 404, message = "Track not found")
+    })
+    @Path("/acabarPartida")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+
+    public Response finalizarPartida(Mensaje m) {
+        this.pm.finalizarPartida(m.getMensaje());
+        m.setMensaje("Partida finalizada");
+        return Response.status(201).entity(m.getMensaje()).build();
     }
 
 

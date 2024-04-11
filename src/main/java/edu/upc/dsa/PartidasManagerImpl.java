@@ -28,15 +28,9 @@ public class PartidasManagerImpl implements PartidasManager {
     @Override
     public void addPartida(String idUser, String idJuego) {
         logger.info("Nueva partida de jugador: " + idUser + " en el Juego: " + idJuego);
-        boolean encontrado = false;
-        for(String s: listaPartidas.keySet()){
-            if(s == idUser){
-                encontrado = true;
-                logger.warn("No se ha podido iniciar la partida ya que el jugador " + idUser + " ya tiene una en marcha.");
-            }
-        }
-        if(!encontrado){
-            Partida p = new Partida(idJuego, idUser);
+        Partida p = listaPartidas.get(idUser);
+        if(p==null){
+            p = new Partida(idJuego, idUser);
             listaPartidas.put(idUser, p);
             logger.info("Nueva partida añadida");
         }
@@ -61,10 +55,9 @@ public class PartidasManagerImpl implements PartidasManager {
     @Override
     public int nivelActual(String idUser) {
         logger.info("Consultar el nivel actual del jugador: " + idUser);
-        try{listaPartidas.get(idUser);}
-        catch(NullPointerException exp) {
-            logger.warn("El usuario no existe o no tiene ninguna partida en marcha");
-            return -1;
+        User user = getUser(idUser);
+        if (user == null) {
+            logger.warn("Usuari no existeix");
         }
         logger.info("Nivel actual = " + listaPartidas.get(idUser).getNivel());
         return listaPartidas.get(idUser).getNivel();
@@ -73,30 +66,35 @@ public class PartidasManagerImpl implements PartidasManager {
     @Override
     public int puntuacionActual(String idUser) {
         logger.info("Consultar la puntuación actual del jugador: " + idUser);
-        try{listaPartidas.get(idUser);}
-        catch(NullPointerException exp) {
-            logger.warn("El usuario no existe o no tiene ninguna partida en marcha");
-            return -1;
+        User user = getUser(idUser);
+        if (user == null) {
+            logger.warn("Usuari no existeix");
         }
         logger.info("Puntuación actual = " + listaPartidas.get(idUser).getPuntuacion());
         return listaPartidas.get(idUser).getPuntuacion();
+    }
+    private User getUser(String idUser) {
+        return listaUsers.get(idUser);
+    }
+
+    private Partida getPartida(String idUser){
+        return listaPartidas.get(idUser);
     }
 
     @Override
     public int subirNivel(String idUser, int puntos, LocalDateTime fecha) {
         logger.info("Subir de nivel a: " + idUser + " con " + puntos + " puntos en el dia " +  fecha);
-        try{listaPartidas.get(idUser);}
-        catch(NullPointerException exp) {
-            logger.warn("El usuario no existe o no tiene ninguna partida en marcha");
-            return -2;
+        User user = getUser(idUser);
+        if (user == null) {
+            logger.warn("Usuari no existeix");
         }
-
         for(Juego j: listaJuegos){
-            if(j.getIdJuego().equals(listaPartidas.get(idUser).getIdJuego())){
-                int err = listaPartidas.get(idUser).actualizarNivel(j.getNiveles(), puntos);
+            if(j.getIdJuego().equals(getPartida(idUser).getIdJuego())){
+                int err = getPartida(idUser).actualizarNivel(j.getNiveles(), puntos);
                 if(err == 0){
                     logger.info("La partida de " +idUser + " ha sido finalizada con " + err + " puntos");
-                    listaUsers.get(idUser).addPartida(listaPartidas.get(idUser));
+                    listaUsers.get(idUser).addPartida(getPartida(idUser));
+                    listaPartidas.remove(idUser);
                     return -1;
                 }
                 logger.info("El jugador " + idUser + " ha subido a nivel " + err);
@@ -107,15 +105,37 @@ public class PartidasManagerImpl implements PartidasManager {
         return -2;
     }
 
+
     @Override
     public void finalizarPartida(String idUser) {
-        try{listaPartidas.get(idUser);}
-        catch(NullPointerException exp) {
-            logger.warn("El usuario no existe o no tiene ninguna partida en marcha");
+        User user = getUser(idUser);
+        if (user == null) {
+            logger.warn("Usuari no existeix");
         }
-        listaUsers.get(idUser).addPartida(listaPartidas.get(idUser));
+        Partida p = getPartida(idUser);
+        user.addPartida(p);
         listaPartidas.remove(idUser);
         logger.info("La partida de " + idUser +" ha sido finalizada");
+    }
+
+    public void setListaPartidas(HashMap<String, Partida> listaPartidas) {
+        this.listaPartidas = listaPartidas;
+    }
+
+    public List<Juego> getListaJuegos() {
+        return listaJuegos;
+    }
+
+    public void setListaJuegos(List<Juego> listaJuegos) {
+        this.listaJuegos = listaJuegos;
+    }
+
+    public void setListaUsers(HashMap<String, User> listaUsers) {
+        this.listaUsers = listaUsers;
+    }
+
+    public static void setInstance(PartidasManager instance) {
+        PartidasManagerImpl.instance = instance;
     }
 
     @Override
@@ -146,11 +166,11 @@ public class PartidasManagerImpl implements PartidasManager {
 
     @Override
     public List<Partida> partidasByUser(String idUser) {
-        try{listaUsers.get(idUser);}
-        catch(NullPointerException exp) {
-            logger.warn("El usuario no existe o no tiene ninguna partida en marcha");
+        User user = listaUsers.get(idUser);
+        if (user == null) {
+            logger.warn("Usuari no existeix");
         }
-        return listaUsers.get(idUser).getListaPartidas();
+        return user.getListaPartidas(); //listaUsers.get(idUser).getListaPartidas();
     }
 
     @Override

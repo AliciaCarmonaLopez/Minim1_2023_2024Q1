@@ -48,7 +48,7 @@ public class PartidasManagerImplTest {
         this.pm.subirNivel("22222", 20, java.time.LocalDateTime.now());
         this.pm.subirNivel("22222", 40, java.time.LocalDateTime.now());
         Assert.assertEquals(1, pm.getListaUsers().get("22222").getListaPartidas().size());
-        Assert.assertEquals(2, pm.getListaPartidas().size());
+        Assert.assertEquals(1, pm.getListaPartidas().size());
         Assert.assertEquals(210, pm.getListaUsers().get("22222").getListaPartidas().get(0).getPuntuacion());
     }
 
